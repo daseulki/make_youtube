@@ -34,7 +34,16 @@ function VideoUploadPage() {
     setPrivate(e.currentTarget.value)
   }
   const onCategoryChange = (e) => {
-    setPrivate(e.currentTarget.value)
+    setCategory(e.currentTarget.value)
+  }
+
+  const onDrop = (files) =>{
+    let formData = new FormData;
+    const config = {
+      header: {}
+    }
+    formData.append('file', files[0])
+    Axios.post('/')
   }
 
   return (
@@ -47,9 +56,10 @@ function VideoUploadPage() {
           {/*  Drop zone  */}
 
           <Dropzone 
-          onDrop
-          multiple 
-          maxSize>
+          onDrop = {onDrop}
+          multiple = {false}
+          maxSize = {10000000}
+          >
             {({ getRootProps, getInputProps}) => (
               <div style={{ width:'300px', height:'240px', border:'1px solid lightgray', display:'flex',
               alignItems:'center', justifyContent:'center'}} {...getRootProps()}>
@@ -79,7 +89,8 @@ function VideoUploadPage() {
         value={VideoDescription} />
         <br/><br/>
 
-        <select onChange={onPrivateChange}>
+        <select onChange={onPrivateChange}
+        value={Private}>
           {PrivateOption.map((item, index) => (
             <option key={index} value ={item.value}>
               {item.label}
@@ -87,7 +98,9 @@ function VideoUploadPage() {
           ))}
         </select>
         <br/><br/>
-        <select onChange={onCategoryChange}>
+        <select onChange={onCategoryChange}
+        value={Category}>
+
           {CategoryOption.map((item, index) => (
             <option key={index} value ={item.value}>
               {item.label}
@@ -101,11 +114,6 @@ function VideoUploadPage() {
         </Button>
         
       </Form>
-
-
-
-
-
     </div>
   )
 }
