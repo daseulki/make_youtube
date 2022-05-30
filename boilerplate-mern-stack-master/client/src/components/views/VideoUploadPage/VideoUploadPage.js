@@ -1,7 +1,9 @@
 
 import React, {useState} from 'react'
 import {Typography, Button, Form, message, Input, Icon} from 'antd'
+import Axios from 'axios'
 import Dropzone from 'react-dropzone'
+
 
 const { TextArea } = Input
 const { Title } = Typography
@@ -40,17 +42,29 @@ function VideoUploadPage() {
   const onDrop = (files) => {
     let formData = new FormData;
     const config = {
-      header: {'content-type' : 'multipart/form-data'}
+      header: {'content-type': 'multipart/form-data'}
     }
     formData.append('file', files[0])
-    Axios.post('/api/', formData, config)
-      .then(res => {
-        if(res.data.success){
-          //
-        } else { 
-          alert('업로드 실패!')
+    Axios.post('/api/video/uploads', formData, config)
+    .then(res => {
+      if(res.data.success){
+        console.log(res.data)
+        let variable = {
+          url: res.data.url,
+          fileName: res.data.fileName
         }
-      })
+        Axios.post('/api/video/thumbnail', variable)
+        .then(res => {
+          if(res.data.success){
+            console.log(res.data)
+          }else{ 
+            alert('썸네일 생성에 실패했음')
+          }
+        })
+      }else{
+        console.log('업로드 실패했습니다.', res.data)
+      }
+    })
   }
 
   return (
@@ -58,7 +72,7 @@ function VideoUploadPage() {
       <div style={{ textAlign: 'center', marginBottom: '2rem'}}>
         <Title level ={2}> Upload video</Title>
       </div>
-      <Form onSubmit>
+      <Form >
         <div style={{ display : 'flex', justifyContent: 'space-between'}}>
           {/*  Drop zone  */}
 
@@ -79,7 +93,7 @@ function VideoUploadPage() {
           </Dropzone>
           {/*  Thumbnail zone  */}
           <div>
-            <img src alt/>
+            <img />
           </div>
         </div>
         <br/><br/>
@@ -96,8 +110,8 @@ function VideoUploadPage() {
         value={VideoDescription} />
         <br/><br/>
 
-        <select onChange={onPrivateChange} 
-                value={Private} >
+        <select onChange={onPrivateChange}
+        value={Private}>
           {PrivateOption.map((item, index) => (
             <option key={index} value ={item.value}>
               {item.label}
@@ -106,7 +120,8 @@ function VideoUploadPage() {
         </select>
         <br/><br/>
         <select onChange={onCategoryChange}
-                value={Category} >
+        value={Category}>
+
           {CategoryOption.map((item, index) => (
             <option key={index} value ={item.value}>
               {item.label}
@@ -115,12 +130,11 @@ function VideoUploadPage() {
         </select>
 
         <br/><br/>
-        <Button type='primary' size="large" onClick>
+        <Button type='primary' size="large" >
           Submit
         </Button>
         
       </Form>
-
     </div>
   )
 }
