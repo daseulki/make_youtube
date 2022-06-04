@@ -3,6 +3,7 @@ import React, {useState} from 'react'
 import {Typography, Button, Form, message, Input, Icon} from 'antd'
 import Axios from 'axios'
 import Dropzone from 'react-dropzone'
+import { useSelector } from "react-redux";
 
 
 const { TextArea } = Input
@@ -17,14 +18,20 @@ const CategoryOption = [
   {value:1, label: 'Auto & Vehicles'},
   {value:2, label: 'Pets & Animals'},
   {value:3, label: 'Music'},
+
 ]
 
-function VideoUploadPage() {
+function VideoUploadPage(props) {
+  const user = useSelector(state => state.user);
 
   const [VideoTitle, setTitle] = useState('')
   const [VideoDescription, setDescription] = useState('')
   const [Private, setPrivate] = useState(0)
   const [Category, setCategory] = useState('Film & Animation')
+  const [FilePath, setFilePath] = useState("")
+  const [Duration, setDuration] = useState("")
+  const [ThumbnailPath, setThumbnailPath] = useState("")
+
 
   const onTitleChange = (e) => {
     setTitle(e.currentTarget.value)
@@ -38,7 +45,43 @@ function VideoUploadPage() {
   const onCategoryChange = (e) => {
     setCategory(e.currentTarget.value)
   }
+  
+  const onSubmit = (e) => {
 
+    e.preventDefault();
+
+    if (user.userData && !user.userData.isAuth) {
+        return alert('Please Log in First')
+    }
+
+    if (VideoTitle === "" || VideoDescription === "" ||
+        Category === "" || FilePath === "" ||
+        Duration === "" || ThumbnailPath === "") {
+        return alert('Please first fill all the fields')
+    }
+
+    const variables = {
+        writer: user.userData._id,
+        title: VideoTitle,
+        description: VideoDescription,
+        privacy: Private,
+        filePath: FilePath,
+        category: Category,
+        duration: Duration,
+        thumbnail: ThumbnailPath
+    }
+
+    Axios.post('/api/video/uploadVideo', variables)
+        .then(res => {
+          if (res.data.success) {
+              alert('video Uploaded Successfully')
+              props.history.push('/')
+          } else {
+              alert('Failed to upload video')
+          }
+      })
+
+}
   const onDrop = (files) => {
     let formData = new FormData;
     const config = {
@@ -47,22 +90,29 @@ function VideoUploadPage() {
     formData.append('file', files[0])
     Axios.post('/api/video/uploads', formData, config)
     .then(res => {
-      if(res.data.success){
-        console.log(res.data)
+      console.log(res.data)
+      if (res.data.success) {
+
         let variable = {
-          url: res.data.url,
-          fileName: res.data.fileName
+            filePath: res.data.filePath,
+            fileName: res.data.fileName
         }
-        Axios.post('/api/video/thumbnail', variable)
-        .then(res => {
-          if(res.data.success){
-            console.log(res.data)
-          }else{ 
-            alert('썸네일 생성에 실패했음')
-          }
-        })
-      }else{
-        console.log('업로드 실패했습니다.', res.data)
+        setFilePath(res.data.filePath)
+
+        //gerenate thumbnail with this filepath ! 
+
+        Axios.post('/api/video/thumbnails', variable)
+            .then(response => {
+                if (response.data.success) {
+                  console.log(response)
+                    setDuration(response.data.fileDuration)
+                    setThumbnailPath(response.data.thumbsFilePath)
+                } else {
+                    alert('Failed to make the thumbnails');
+                }
+            })
+      } else {
+        alert('failed to save the video in server')
       }
     })
   }
@@ -72,7 +122,7 @@ function VideoUploadPage() {
       <div style={{ textAlign: 'center', marginBottom: '2rem'}}>
         <Title level ={2}> Upload video</Title>
       </div>
-      <Form >
+      <Form  onSubmit={onSubmit}>
         <div style={{ display : 'flex', justifyContent: 'space-between'}}>
           {/*  Drop zone  */}
 
@@ -92,9 +142,11 @@ function VideoUploadPage() {
             }
           </Dropzone>
           {/*  Thumbnail zone  */}
+          { ThumbnailPath &&
           <div>
-            <img />
+            <img src={`http://localhost:5000/${ThumbnailPath}`} alt="thumbnail"/>
           </div>
+          }
         </div>
         <br/><br/>
         <label> Title </label><br/>
@@ -130,7 +182,7 @@ function VideoUploadPage() {
         </select>
 
         <br/><br/>
-        <Button type='primary' size="large" >
+        <Button type='primary' size="large"  onClick={onSubmit} >
           Submit
         </Button>
         
