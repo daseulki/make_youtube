@@ -46,10 +46,10 @@ router.post("/thumbnails", (req, res) => {
     let fileDuration ="";
 
     //비디오 정보 갖고왔음 
-    ffmpeg.ffprobe(req.body.filePath, (metadata, err) => {
-        console.log(err)
-        console.dir(metadata);
-        console.log(metadata.format.duration);
+    ffmpeg.ffprobe(req.body.filePath, (err, metadata) => {
+        // console.log(err)
+        // console.dir(metadata);
+        // console.log(metadata.format.duration);
         fileDuration = metadata.format.duration;
     })
 
@@ -85,7 +85,7 @@ router.post("/uploadVideo", (req, res) => {
 
     const video = new Video(req.body)
 
-    video.save((err, video) => {
+    video.save((err) => {
         if(err) return res.status(400).json({ success: false, err })
         return res.status(200).json({
             success: true 

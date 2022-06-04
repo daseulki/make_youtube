@@ -61,14 +61,14 @@ function VideoUploadPage(props) {
     }
 
     const variables = {
-        writer: user.userData._id,
-        title: VideoTitle,
-        description: VideoDescription,
-        privacy: Private,
-        filePath: FilePath,
-        category: Category,
-        duration: Duration,
-        thumbnail: ThumbnailPath
+      writer: user.userData._id,
+      title: VideoTitle,
+      description: VideoDescription,
+      privacy: Private,
+      filePath: FilePath,
+      category: Category,
+      duration: Duration,
+      thumbnail: ThumbnailPath
     }
 
     Axios.post('/api/video/uploadVideo', variables)
@@ -94,23 +94,23 @@ function VideoUploadPage(props) {
       if (res.data.success) {
 
         let variable = {
-            filePath: res.data.filePath,
-            fileName: res.data.fileName
+          filePath: res.data.url,
+          fileName: res.data.fileName
         }
         setFilePath(res.data.filePath)
 
         //gerenate thumbnail with this filepath ! 
 
         Axios.post('/api/video/thumbnails', variable)
-            .then(response => {
-                if (response.data.success) {
-                  console.log(response)
-                    setDuration(response.data.fileDuration)
-                    setThumbnailPath(response.data.thumbsFilePath)
-                } else {
-                    alert('Failed to make the thumbnails');
-                }
-            })
+          .then(response => {
+              if (response.data.success) {
+                console.log(response)
+                  setDuration(response.data.fileDuration)
+                  setThumbnailPath(response.data.thumbsFilePath)
+              } else {
+                  alert('Failed to make the thumbnails');
+              }
+          })
       } else {
         alert('failed to save the video in server')
       }
