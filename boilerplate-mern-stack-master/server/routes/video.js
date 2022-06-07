@@ -95,8 +95,7 @@ router.post("/uploadVideo", (req, res) => {
 });
 
 
-router.post("/getVideo", (req, res) => {
-
+router.post("/getVideoDetail", (req, res) => {
     Video.findOne({ "_id" : req.body.videoId })
     .populate('writer')
     .exec((err, video) => {
