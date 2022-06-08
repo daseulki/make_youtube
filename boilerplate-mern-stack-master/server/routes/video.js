@@ -71,30 +71,26 @@ router.post("/thumbnails", (req, res) => {
         });
  });
 
- router.get("/getVideos", (req, res) => {
-    Video.find()
-        .populate('writer') //모든 정보를 가져오려면 populated 사용해야됨 
-        .exec((err, videos) => {
-            if(err) return res.status(400).send(err);
-            res.status(200).json({ success: true, videos })
-        })
-
-});
-
-router.post("/uploadVideo", (req, res) => {
-
-    const video = new Video(req.body)
-
-    video.save((err) => {
-        if(err) return res.status(400).json({ success: false, err })
-        return res.status(200).json({
-            success: true 
-        })
+//비디오를 DB에서 get 
+router.get('/getVideos',(req, res) =>{
+    //model 정의시 type: Schema로 정의된 모든 데이터를 불러오는 조건 => populate(값이름) 메소드 호출
+    Video.find().populate('writer').exec((err,videos) => {
+        if(err) return res.status(400).send(err);
+        res.status(200).json({success: true, videos})
     })
+ })
 
-});
 
+//비디오 정보들을 저장
+router.post('/uploadVideo',(req, res) =>{
+    const video = new Video(req.body) //Video 모델의 모든 정보들을 다 가져옴
+    video.save((err, doc) => {
+        if (err) return res.json({success: false, err})
+        res.status(200).json({success: true})
+    })
+ })
 
+ 
 router.post("/getVideoDetail", (req, res) => {
     Video.findOne({ "_id" : req.body.videoId })
     .populate('writer')
@@ -105,27 +101,26 @@ router.post("/getVideoDetail", (req, res) => {
 });
 
 
-router.post("/getSubscriptionVideos", (req, res) => {
+// router.post("/getSubscriptionVideos", (req, res) => {
+//     Subscriber.find({ 'userFrom': req.body.userFrom })
+//     .exec((err, subscribers)=> {
+//         if(err) return res.status(400).send(err);
 
-    Subscriber.find({ 'userFrom': req.body.userFrom })
-    .exec((err, subscribers)=> {
-        if(err) return res.status(400).send(err);
+//         let subscribedUser = [];
 
-        let subscribedUser = [];
-
-        subscribers.map((subscriber, i)=> {
-            subscribedUser.push(subscriber.userTo)
-        })
+//         subscribers.map((subscriber, i)=> {
+//             subscribedUser.push(subscriber.userTo)
+//         })
 
 
-        //Need to Fetch all of the Videos that belong to the Users that I found in previous step. 
-        Video.find({ writer: { $in: subscribedUser }})
-            .populate('writer')
-            .exec((err, videos) => {
-                if(err) return res.status(400).send(err);
-                res.status(200).json({ success: true, videos })
-            })
-    })
-});
+//         //Need to Fetch all of the Videos that belong to the Users that I found in previous step. 
+//         Video.find({ writer: { $in: subscribedUser }})
+//             .populate('writer')
+//             .exec((err, videos) => {
+//                 if(err) return res.status(400).send(err);
+//                 res.status(200).json({ success: true, videos })
+//             })
+//     })
+// });
  
 module.exports = router;

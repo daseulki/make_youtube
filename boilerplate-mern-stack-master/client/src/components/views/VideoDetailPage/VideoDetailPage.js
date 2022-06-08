@@ -1,88 +1,54 @@
 import React, { useEffect, useState } from 'react'
-import { List, Avatar, Row, Col } from 'antd';
-import Axios from 'axios';
-import SideVideo from './Sections/SideVideo';
-import Subscriber from './Sections/Subscriber';
-import Comments from './Sections/Comments'
-import LikeDislikes from './Sections/LikeDislikes';
+import {Row, Col, List, Avatar} from 'antd'
+import Axios from 'axios'
+
+
 function VideoDetailPage(props) {
-
     const videoId = props.match.params.videoId
-    const [Video, setVideo] = useState([])
-    const [CommentLists, setCommentLists] = useState([])
+    const variable = {videoId: videoId}
 
-    const videoVariable = {
-        videoId
-    }
+    const [VideoDetail, setVideoDetail] = useState([])
 
     useEffect(() => {
-        Axios.post('/api/video/getVideoDetail', videoVariable)
-            .then(response => {
-                if (response.data.success) {
-                    console.log(response.data.video)
-                    setVideo(response.data.video)
-                } else {
-                    alert('Failed to get video Info')
-                }
-            })
+        Axios.post('/api/video/getVideoDetail', variable)
+        .then(res => {
+            console.log('???????????',res.data)
+            if(res.data.success) {
+                setVideoDetail(res.data.video)
+            }else{
+                alert('비디오 정보를 가져오기 실패')
+            }
+        })
+    },[])
 
-        // Axios.post('/api/comment/getComments', videoVariable)
-        //     .then(response => {
-        //         if (response.data.success) {
-        //             console.log('response.data.comments',response.data.comments)
-        //             setCommentLists(response.data.comments)
-        //         } else {
-        //             alert('Failed to get video Info')
-        //         }
-        //     })
-
-
-    }, [])
-
-    const updateComment = (newComment) => {
-        setCommentLists(CommentLists.concat(newComment))
-    }
-
-
-    if (Video.writer) {
+    if(VideoDetail.writer){
         return (
-            <Row>
+            <Row gutter={[16,16]}>
                 <Col lg={18} xs={24}>
-                    <div className="postPage" style={{ width: '100%', padding: '3rem 4em' }}>
-                        <video style={{ width: '100%' }} src={`http://localhost:5000/${Video.filePath}`} controls></video>
+                    <div style={{width: '100%', padding:'3rem 4rem'}}>
+                        <video style={{width: '100%'}} src={`http://localhost:5000/${VideoDetail.filePath}`} controls />
 
-                        <List.Item
-                            actions={[<LikeDislikes video videoId={videoId} userId={localStorage.getItem('userId')}  />, <Subscriber userTo={Video.writer._id} userFrom={localStorage.getItem('userId')} />]}
-                        >
-                            <List.Item.Meta key={Video.writer.id}
-                                avatar={<Avatar src={Video.writer && Video.writer.image} />}
-                                title={<a href="https://ant.design">{Video.title}</a>}
-                                description={Video.description}
-                            />
-                            <div></div>
+                        <List.Item actions>
+                            <List.Item.Meta 
+                                avatar={<Avatar src={VideoDetail.writer.image}/>}
+                                title={VideoDetail.writer.name}
+                                description={VideoDetail.description}/>
                         </List.Item>
-
-                        <Comments CommentLists={CommentLists} postId={Video._id} refreshFunction={updateComment} />
-
                     </div>
+
+
                 </Col>
                 <Col lg={6} xs={24}>
-
-                    <SideVideo />
-
+                    Side Video
                 </Col>
             </Row>
         )
-
-    } else {
-        return (
-            <div>Loading...</div>
+    } else{
+        return(
+            <div>Loading....</div>
         )
     }
-
-
+    
 }
 
 export default VideoDetailPage
-
-
