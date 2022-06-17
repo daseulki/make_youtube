@@ -5,7 +5,7 @@ import { Button } from 'antd';
 function Subscribe() {
     return (
         <div>
-            <Button type="primary">
+            <Button type="warning">
                 0 Subscribe
             </Button>
         </div>
