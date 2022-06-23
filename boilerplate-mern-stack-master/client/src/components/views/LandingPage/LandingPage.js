@@ -61,6 +61,14 @@ function LandingPage() {
             <Row gutter={[32, 16]}>
                 {renderCards}
             </Row>
+            
+            <br />
+            <Title level={2} > Subscription </Title>
+            <hr />
+
+            <Row gutter={[32, 16]}>
+                {renderCards}
+            </Row>
         </div>
     )
 }

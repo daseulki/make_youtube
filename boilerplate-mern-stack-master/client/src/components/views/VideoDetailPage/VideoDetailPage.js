@@ -14,13 +14,14 @@ function VideoDetailPage(props) {
     useEffect(() => {
         Axios.post('/api/video/getVideoDetail', variable)
         .then(res => {
-            console.log('???????????',res.data)
             if(res.data.success) {
                 setVideoDetail(res.data.video)
             }else{
                 alert('비디오 정보를 가져오기 실패')
             }
         })
+
+        
     },[])
 
     if(VideoDetail.writer){
@@ -30,7 +31,7 @@ function VideoDetailPage(props) {
                     <div style={{width: '100%', padding:'3rem 4rem'}}>
                         <video style={{width: '100%'}} src={`http://localhost:5000/${VideoDetail.filePath}`} controls />
 
-                        <List.Item actions={[<Subscribe/>]}>
+                        <List.Item actions={[<Subscribe userTo={VideoDetail.writer._id}/>]}>
                             <List.Item.Meta 
                                 avatar={<Avatar src={VideoDetail.writer.image}/>}
                                 title={VideoDetail.writer.name}
