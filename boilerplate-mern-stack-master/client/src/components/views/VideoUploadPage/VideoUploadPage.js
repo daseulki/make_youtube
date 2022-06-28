@@ -1,6 +1,6 @@
 
 import React, {useState} from 'react'
-import {Typography, Button, Form, message, Input, Icon} from 'antd'
+import {Typography, Button, Form, Input, Icon} from 'antd'
 import Axios from 'axios'
 import Dropzone from 'react-dropzone'
 import { useSelector } from "react-redux";
@@ -83,7 +83,7 @@ function VideoUploadPage(props) {
 
 }
   const onDrop = (files) => {
-    let formData = new FormData;
+    let formData = new FormData();
     const config = {
       header: {'content-type': 'multipart/form-data'}
     }

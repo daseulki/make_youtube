@@ -5,6 +5,7 @@ const { Video } = require("../models/video");
 const { auth } = require("../middleware/auth");
 const multer = require('multer')
 var ffmpeg = require('fluent-ffmpeg')
+const { Subscriber } = require("../models/Subscriber");
 
 //multer config
 var storage = multer.diskStorage({
@@ -101,26 +102,26 @@ router.post("/getVideoDetail", (req, res) => {
 });
 
 
-// router.post("/getSubscriptionVideos", (req, res) => {
-//     Subscriber.find({ 'userFrom': req.body.userFrom })
-//     .exec((err, subscribers)=> {
-//         if(err) return res.status(400).send(err);
+router.post("/getSubscriptionVideos", (req, res) => {
+    Subscriber.find({ 'userFrom': req.body.userFrom })
+    .exec((err, subscribers)=> {
+        if(err) return res.status(400).send(err);
 
-//         let subscribedUser = [];
+        let subscribedUser = [];
 
-//         subscribers.map((subscriber, i)=> {
-//             subscribedUser.push(subscriber.userTo)
-//         })
+        subscribers.map((subscriber, i)=> {
+            subscribedUser.push(subscriber.userTo)
+        })
 
 
-//         //Need to Fetch all of the Videos that belong to the Users that I found in previous step. 
-//         Video.find({ writer: { $in: subscribedUser }})
-//             .populate('writer')
-//             .exec((err, videos) => {
-//                 if(err) return res.status(400).send(err);
-//                 res.status(200).json({ success: true, videos })
-//             })
-//     })
-// });
+        //Need to Fetch all of the Videos that belong to the Users that I found in previous step. 
+        Video.find({ writer: { $in: subscribedUser }})
+            .populate('writer')
+            .exec((err, videos) => {
+                if(err) return res.status(400).send(err);
+                res.status(200).json({ success: true, videos })
+            })
+    })
+});
  
 module.exports = router;
